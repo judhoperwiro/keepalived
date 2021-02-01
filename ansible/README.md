@@ -5,7 +5,7 @@
 - ansible 2.9 
 - vim
 
-### 1.) Create Directory for Elasticsearch 
+### 1.) Create Directory for KeepAlived 
 ```shell 
 mkdir -p /data/ansible/keepalived/source/
 cd /data/ansible/keepalived/
