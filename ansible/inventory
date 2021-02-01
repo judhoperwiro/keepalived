@@ -1,0 +1,15 @@
+##################KEEPALIVED#############
+hostname ansible_host=hostname-machine-01 priority=103 master_01=hostname-machine-01 master_02=hostname-machine-02 master_03=hostname-machine-03
+hostname ansible_host=hostname-machine-02 priority=102 master_01=hostname-machine-02 master_02=hostname-machine-01 master_03=hostname-machine-03
+hostname ansible_host=hostname-machine-03 priority=101 master_01=hostname-machine-03 master_02=hostname-machine-02 master_03=hostname-machine-01
+
+[keepalived]
+hostname-machine-01
+hostname-machine-02
+hostname-machine-03
+
+[keepalived:vars]
+ansible_user=redhat
+ansible_password=redhat
+ansible_sudo_pass=redhat
+virtual_ip_address=10.0.0.1/24
