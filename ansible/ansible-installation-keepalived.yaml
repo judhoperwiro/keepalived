@@ -1,0 +1,67 @@
+---
+- hosts: keepalived
+  remote_user: redhat
+  become: true
+  tasks:
+    - name: 01. prepare Source dir
+      file:
+        path: /Source
+        owner: root
+        group: root
+        mode: 0777
+        state: directory
+
+    - name: 02. transfer keepalived.tar file
+      copy:
+        src: /data/ansible/keepalived/source/keepalived.tar.gz
+        dest: /Source
+
+    - name: 03. Extract tar files
+      unarchive:
+        src: /Source/keepalived.tar.gz
+        dest: /Source/
+        mode: 0777
+        remote_src: yes
+
+    - name: 04. Install KeepAlived Packages
+      yum:
+        name:
+        - libmpc
+        - cpp
+        - glibc-devel
+        state: present
+
+    - name: 05. Install KeepAlived
+      shell: |
+        yum install -y --cacheonly --disablerepo=* /Source/keepalived/*.rpm 
+        mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak 
+    
+    - name: 06. Configure Keepalived
+      blockinfile:
+        path: /etc/keepalived/keepalived.conf
+        block: |
+         state MASTER 
+           vrrp_instance VI_01 { 
+                   interface eth0
+                   virtual_router_id 51 
+                   priority {{ priority }} 
+                   advert_int 1 
+                   unicast_peer { 
+                           {{ master_02 }}
+                           {{ master_03 }} 
+                   } 
+                   mcast_src_ip {{ master_01 }} 
+                   authentication { 
+                     auth_type PASS 
+                     auth_pass 12345678 
+                   } 
+                    virtual_ipaddress { 
+                           {{ virtual_ip_address }} label eth0:1 
+                   } 
+            } 
+
+    - name: Restart Keepalived
+      systemd:
+        state: restarted
+        name: keepalived
+        enabled: yes
