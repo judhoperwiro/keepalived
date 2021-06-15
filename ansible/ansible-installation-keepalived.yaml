@@ -36,7 +36,15 @@
         yum install -y --cacheonly --disablerepo=* /Source/keepalived/*.rpm 
         mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak 
     
-    - name: 06. Configure Keepalived
+    - name: 06. Create Keepalived Config File
+      file:
+        path: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: 0640
+        state: touch
+
+    - name: 07. Configure Keepalived
       blockinfile:
         path: /etc/keepalived/keepalived.conf
         block: |
@@ -60,7 +68,7 @@
                    } 
             } 
 
-    - name: Restart Keepalived
+    - name: 08. Restart Keepalived
       systemd:
         state: restarted
         name: keepalived
